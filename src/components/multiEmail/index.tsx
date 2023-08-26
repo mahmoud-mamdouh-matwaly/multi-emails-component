@@ -111,7 +111,7 @@ const MultiEmail = (props: Props) => {
           }
         }}
       >
-        {placeholder && emails.length === 0 ? (
+        {placeholder && emails.length === 0 && !isFocused  ? (
           <span data-placeholder>{placeholder}</span>
         ) : null}
         {emails.map((item, index) => (
