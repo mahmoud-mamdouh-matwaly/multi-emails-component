@@ -1,33 +1,34 @@
- interface Email{
+import { Email } from "./types";
+
+export const isValid = (
   email: string,
-  edit: boolean
-}
-export const isValid = (email: string, handleError: (value: string) => void, arr: Email[]) => {
-    let error = null;
+  handleError: (value: string) => void,
+  arr: Email[]
+) => {
+  let error = null;
 
-    if (isInList(email, arr)) {
-      error = `${email} has already been added.`;
-    }
+  if (isInList(email, arr)) {
+    error = `${email} has already been added.`;
+  }
 
-    if (!isEmail(email)) {
-      error = `${email} is not a valid email address.`;
-    }
+  if (!isEmail(email)) {
+    error = `${email} is not a valid email address.`;
+  }
 
-    if (error) {
-      handleError(error);
+  if (error) {
+    handleError(error);
 
-      return false;
-    }
+    return false;
+  }
 
-    return true;
-  };
+  return true;
+};
 
+const isInList = (email: string, arr: Email[]) => {
+  return arr?.find((item) => item.email?.includes(email));
+};
 
-  const isInList = (email: string, arr: Email[]) => {
-    return arr?.find((item) => item.email?.includes(email));
-  };
-
-  const isEmail = (email: string) => {
-    // eslint-disable-next-line no-useless-escape
-    return /[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/.test(email);
-  };
+const isEmail = (email: string) => {
+  // eslint-disable-next-line no-useless-escape
+  return /[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/.test(email);
+};

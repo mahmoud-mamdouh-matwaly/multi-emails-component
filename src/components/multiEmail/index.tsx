@@ -7,18 +7,9 @@ import {
   StyledError,
 } from "./styles";
 import useEmailsBox from "./reducer";
- import { isValid } from "./utils";
-  interface Email{
-  email: string,
-  edit: boolean
-}
- 
-  type Props = {
-  placeholder: string;
-  getEmails: (emails: Email[]) => void;
-  emails: Email[];
-  labelText: string;
-}
+import { isValid } from "./utils";
+import { Props, Email } from "./types";
+
 const MultiEmail = (props: Props) => {
   const { placeholder, getEmails, emails, labelText } = props;
 
@@ -48,17 +39,22 @@ const MultiEmail = (props: Props) => {
     }
   };
 
-  const handleChange = (evt: {target: {value: string}}) => {
+  const handleChange = (evt: { target: { value: string } }) => {
     handleValue(evt.target.value);
   };
 
-  const handleDelete = (item: Email) => (evt: {preventDefault: () => void, stopPropagation: () => void}) => {
-    evt.preventDefault();
-    evt.stopPropagation();
-    getEmails(emails.filter((i) => i.email !== item.email));
-  };
+  const handleDelete =
+    (item: Email) =>
+    (evt: { preventDefault: () => void; stopPropagation: () => void }) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      getEmails(emails.filter((i) => i.email !== item.email));
+    };
 
-  const handlePaste = (evt: {preventDefault: () => void, clipboardData: {getData: (text: string) => string} } ) => {
+  const handlePaste = (evt: {
+    preventDefault: () => void;
+    clipboardData: { getData: (text: string) => string };
+  }) => {
     evt.preventDefault();
     const paste = evt.clipboardData.getData("text");
     if (isValid(paste, handleError, emails)) {
@@ -78,49 +74,57 @@ const MultiEmail = (props: Props) => {
     handleValue("");
   };
 
-  const changeEditStatus = (index: number) => (evt: {preventDefault: () => void, stopPropagation: () => void}) => {
-    handleIsEdit(true);
-    evt.preventDefault();
-    evt.stopPropagation();
-    const newArr = [...emails];
-    newArr[index] = { ...newArr[index], edit: true };
-    getEmails(newArr);
-  };
+  const changeEditStatus =
+    (index: number) =>
+    (evt: { preventDefault: () => void; stopPropagation: () => void }) => {
+      handleIsEdit(true);
+      evt.preventDefault();
+      evt.stopPropagation();
+      const newArr = [...emails];
+      newArr[index] = { ...newArr[index], edit: true };
+      getEmails(newArr);
+    };
   const handleChangedData = (newArr: Email[]) => {
     getEmails(newArr);
     handleIsEdit(false);
-    handleValue('');
+    handleValue("");
     handleError(null);
   };
-  
-  const onBlurEdit = (index: number) => (evt: {target: {value: string}, key: string, preventDefault: () => void}) => {
-    if (["Enter", "Tab", ","].includes(evt.key)) {
-      const newValue = evt.target.value?.trim();
-      const newArr = [...emails];
 
-      if (newValue && isValid(newValue, handleError, emails)) {
-        newArr[index] = { email: newValue, edit: false };
-        handleChangedData(newArr)
-        return;
+  const onBlurEdit =
+    (index: number) =>
+    (evt: {
+      target: { value: string };
+      key: string;
+      preventDefault: () => void;
+    }) => {
+      if (["Enter", "Tab", ","].includes(evt.key)) {
+        const newValue = evt.target.value?.trim();
+        const newArr = [...emails];
+
+        if (newValue && isValid(newValue, handleError, emails)) {
+          newArr[index] = { email: newValue, edit: false };
+          handleChangedData(newArr);
+          return;
+        }
+        newArr[index] = { ...newArr[index], edit: false };
+        handleChangedData(newArr);
       }
-      newArr[index] = { ...newArr[index], edit: false };
-      handleChangedData(newArr)
-    }
-  };
+    };
 
   return (
     <StyledWrapper>
-      <label className='email-label'>{labelText}</label>
+      <label className="email-label">{labelText}</label>
       <StyledContainerTextArea
         isfocused={isFocused ? 1 : 0}
-        isempty={(value === "" && emails.length === 0 && !isFocused) ? 1 : 0}
+        isempty={value === "" && emails.length === 0 && !isFocused ? 1 : 0}
         onClick={() => {
           if (emailInputRef?.current) {
-           emailInputRef?.current?.focus();
+            emailInputRef?.current?.focus();
           }
         }}
       >
-        {placeholder && emails.length === 0 && !isFocused  ? (
+        {placeholder && emails.length === 0 && !isFocused ? (
           <span data-placeholder>{placeholder}</span>
         ) : null}
         {emails.map((item, index) => (

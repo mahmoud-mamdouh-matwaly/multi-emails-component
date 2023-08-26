@@ -1,12 +1,6 @@
 import styled, { css } from "styled-components";
-  interface ContainerTextAreaProps {
-  isfocused?: number;
-  isempty?: number;
-}
- 
-  interface isEditProps {
-  isedit: number;
-}
+import { ContainerTextAreaProps, isEditProps } from "./types";
+
 export const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
