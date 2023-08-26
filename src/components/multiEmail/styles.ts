@@ -1,12 +1,6 @@
 import styled, { css } from "styled-components";
-interface ContainerTextAreaProps {
-  isFocused?: boolean;
-  isEmpty?: boolean;
-}
- 
-interface isEditProps {
-  isEdit: boolean;
-}
+import { ContainerTextAreaProps, isEditProps } from "./types";
+
 export const StyledWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -65,21 +59,21 @@ export const StyledContainerTextArea = styled.div<ContainerTextAreaProps>`
     display: none;
   }
   ${(props: ContainerTextAreaProps) =>
-    props.isFocused &&
+    props.isfocused &&
     css`
       & span[data-placeholder] {
         display: none;
       }
     `}
   ${(props: ContainerTextAreaProps) =>
-    props.isEmpty &&
+    props.isempty &&
     css`
       & span[data-placeholder] {
         display: inline;
         color: #9ea4b0;
       }
     `}  
-  & input {
+  & email-input {
     width: auto;
     outline: none;
     border: 0 none;
@@ -126,7 +120,7 @@ export const StyledEmail = styled.div<isEditProps>`
     line-height: 11px;
   }
   ${(props: isEditProps) =>
-    props.isEdit &&
+    props.isedit &&
     css`
       pointer-events: none;
     `}

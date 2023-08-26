@@ -7,20 +7,11 @@ import {
   StyledError,
 } from "./styles";
 import useEmailsBox from "./reducer";
-interface Email{
-  email: string,
-  edit: boolean
-}
- 
-type Props = {
-  placeholder: string;
-  getEmails: (emails: Email[]) => void;
-  emails: Email[];
-}
+import { Props, Email } from "./types";
+import { isValid } from "./utils";
 
 const MultiEmail = (props: Props) => {
-  const { placeholder, getEmails, emails } = props;
-  console.log("🚀 ~ file: index.tsx:23 ~ MultiEmail ~ emails:", emails)
+  const { placeholder, getEmails, emails, labelText } = props;
 
   const emailInputRef = useRef<HTMLInputElement>(null);
 
@@ -34,12 +25,13 @@ const MultiEmail = (props: Props) => {
     handleIsEdit,
     isEdit,
   } = useEmailsBox();
+
   const handleKeyDown = (evt: any) => {
     if (["Enter", "Tab", ","].includes(evt.key)) {
       evt.preventDefault();
       const newValue = evt.target.value?.trim();
 
-      if (newValue && isValid(newValue)) {
+      if (newValue && isValid(newValue, handleError, emails)) {
         getEmails([...emails, { email: newValue, edit: false }]);
         handleValue("");
         handleError(null);
@@ -59,42 +51,11 @@ const MultiEmail = (props: Props) => {
 
   const handlePaste = (evt: {preventDefault: () => void, clipboardData: {getData: (text: string) => string} } ) => {
     evt.preventDefault();
-
     const paste = evt.clipboardData.getData("text");
-
-    if (isValid(paste)) {
+    if (isValid(paste, handleError, emails)) {
       getEmails([...emails, { email: paste, edit: false }]);
       handleError(null);
     }
-  };
-
-  const isValid = (email: string) => {
-    let error = null;
-
-    if (isInList(email)) {
-      error = `${email} has already been added.`;
-    }
-
-    if (!isEmail(email)) {
-      error = `${email} is not a valid email address.`;
-    }
-
-    if (error) {
-      handleError(error);
-
-      return false;
-    }
-
-    return true;
-  };
-
-  const isInList = (email: string) => {
-    return emails?.find((item) => item.email?.includes(email));
-  };
-
-  const isEmail = (email: string) => {
-    // eslint-disable-next-line no-useless-escape
-    return /[\w\d\.-]+@[\w\d\.-]+\.[\w\d\.-]+/.test(email);
   };
 
   const handleOnFocus = () => {
@@ -105,7 +66,6 @@ const MultiEmail = (props: Props) => {
     if (emails.length === 0 && !value) {
       handleIsFocused(false);
     }
-
     handleValue("");
   };
 
@@ -117,40 +77,34 @@ const MultiEmail = (props: Props) => {
     newArr[index] = { ...newArr[index], edit: true };
     getEmails(newArr);
   };
-
+  const handleChangedData = (newArr: Email[]) => {
+    getEmails(newArr);
+    handleIsEdit(false);
+    handleValue('');
+    handleError(null);
+  };
+  
   const onBlurEdit = (index: number) => (evt: {target: {value: string}, key: string, preventDefault: () => void}) => {
     if (["Enter", "Tab", ","].includes(evt.key)) {
       const newValue = evt.target.value?.trim();
       const newArr = [...emails];
-      if (emails.some((item) => item.email === newValue) && isValid(newValue)) {
-        newArr[index] = { ...newArr[index], edit: false };
-        getEmails(newArr);
-        handleIsEdit(false);
-        handleValue("");
-        handleError(null);
-        return;
-      }
-      if (newValue && isValid(newValue)) {
+
+      if (newValue && isValid(newValue, handleError, emails)) {
         newArr[index] = { email: newValue, edit: false };
-        getEmails(newArr);
-        handleIsEdit(false);
-        handleValue("");
-        handleError(null);
+        handleChangedData(newArr)
         return;
       }
       newArr[index] = { ...newArr[index], edit: false };
-      getEmails(newArr);
-      handleIsEdit(false);
-      handleValue("");
+      handleChangedData(newArr)
     }
   };
 
   return (
     <StyledWrapper>
-      <label>Emails *</label>
+      <label className='email-label'>{labelText}</label>
       <StyledContainerTextArea
-        isFocused={isFocused}
-        isEmpty={!!(value === "" && emails.length === 0 && !isFocused)}
+        isfocused={isFocused ? 1 : 0}
+        isempty={(value === "" && emails.length === 0 && !isFocused) ? 1 : 0}
         onClick={() => {
           if (emailInputRef?.current) {
            emailInputRef?.current?.focus();
@@ -164,7 +118,7 @@ const MultiEmail = (props: Props) => {
           <StyledEmailContainer className="tag-item" key={`${item.email}`}>
             <StyledEmail
               onClick={!isEdit ? changeEditStatus(index) : undefined}
-              isEdit={item.edit}
+              isedit={item.edit ? 1 : 0}
             >
               {!item.edit && (
                 <>
@@ -181,7 +135,7 @@ const MultiEmail = (props: Props) => {
               {item.edit && (
                 <input
                   ref={emailInputRef!}
-                  className={`input ${error && " has-error"}`}
+                  className={`email-input ${error && "has-error"}`}
                   value={value || item.email}
                   name="email"
                   onChange={handleChange}
@@ -194,7 +148,7 @@ const MultiEmail = (props: Props) => {
         {!isEdit && (
           <input
             ref={emailInputRef!}
-            className={`input ${error && " has-error"}`}
+            className={`email-input ${error && "has-error"}`}
             data-testid="multiEmails"
             value={value}
             onKeyDown={handleKeyDown}
