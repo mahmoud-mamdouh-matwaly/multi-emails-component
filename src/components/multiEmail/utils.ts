@@ -1,5 +1,7 @@
-import {   Email } from "./types";
-
+ interface Email{
+  email: string,
+  edit: boolean
+}
 export const isValid = (email: string, handleError: (value: string) => void, arr: Email[]) => {
     let error = null;
 

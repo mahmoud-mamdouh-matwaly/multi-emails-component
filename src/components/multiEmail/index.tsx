@@ -7,9 +7,18 @@ import {
   StyledError,
 } from "./styles";
 import useEmailsBox from "./reducer";
-import { Props, Email } from "./types";
-import { isValid } from "./utils";
-
+ import { isValid } from "./utils";
+  interface Email{
+  email: string,
+  edit: boolean
+}
+ 
+  type Props = {
+  placeholder: string;
+  getEmails: (emails: Email[]) => void;
+  emails: Email[];
+  labelText: string;
+}
 const MultiEmail = (props: Props) => {
   const { placeholder, getEmails, emails, labelText } = props;
 
