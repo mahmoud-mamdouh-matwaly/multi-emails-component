@@ -1,30 +1,16 @@
 import React, { useRef } from "react";
-import {
-  StyledContainerTextArea,
-  StyledEmail,
-  StyledWrapper,
-  StyledEmailContainer,
-  StyledError,
-} from "./styles";
+import { StyledContainerTextArea, StyledWrapper, StyledEmailContainer, StyledError } from "./styles";
 import useEmailsBox from "./reducer";
 import { isValid } from "./utils";
-import { Props, Email } from "./types";
+import { Props } from "./types";
+import EmailsView from "./emails-view";
 
 const MultiEmail = (props: Props) => {
   const { placeholder, getEmails, emails, labelText } = props;
 
   const emailInputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    value,
-    handleValue,
-    error,
-    handleError,
-    isFocused,
-    handleIsFocused,
-    handleIsEdit,
-    isEdit,
-  } = useEmailsBox();
+  const { value, handleValue, error, handleError, isFocused, handleIsFocused, handleIsEdit, isEdit } = useEmailsBox();
 
   const handleKeyDown = (evt: any) => {
     if (["Enter", "Tab", ","].includes(evt.key)) {
@@ -43,18 +29,7 @@ const MultiEmail = (props: Props) => {
     handleValue(evt.target.value);
   };
 
-  const handleDelete =
-    (item: Email) =>
-    (evt: { preventDefault: () => void; stopPropagation: () => void }) => {
-      evt.preventDefault();
-      evt.stopPropagation();
-      getEmails(emails.filter((i) => i.email !== item.email));
-    };
-
-  const handlePaste = (evt: {
-    preventDefault: () => void;
-    clipboardData: { getData: (text: string) => string };
-  }) => {
+  const handlePaste = (evt: { preventDefault: () => void; clipboardData: { getData: (text: string) => string } }) => {
     evt.preventDefault();
     const paste = evt.clipboardData.getData("text");
     if (isValid(paste, handleError, emails)) {
@@ -74,44 +49,6 @@ const MultiEmail = (props: Props) => {
     handleValue("");
   };
 
-  const changeEditStatus =
-    (index: number) =>
-    (evt: { preventDefault: () => void; stopPropagation: () => void }) => {
-      handleIsEdit(true);
-      evt.preventDefault();
-      evt.stopPropagation();
-      const newArr = [...emails];
-      newArr[index] = { ...newArr[index], edit: true };
-      getEmails(newArr);
-    };
-  const handleChangedData = (newArr: Email[]) => {
-    getEmails(newArr);
-    handleIsEdit(false);
-    handleValue("");
-    handleError(null);
-  };
-
-  const onBlurEdit =
-    (index: number) =>
-    (evt: {
-      target: { value: string };
-      key: string;
-      preventDefault: () => void;
-    }) => {
-      if (["Enter", "Tab", ","].includes(evt.key)) {
-        const newValue = evt.target.value?.trim();
-        const newArr = [...emails];
-
-        if (newValue && isValid(newValue, handleError, emails)) {
-          newArr[index] = { email: newValue, edit: false };
-          handleChangedData(newArr);
-          return;
-        }
-        newArr[index] = { ...newArr[index], edit: false };
-        handleChangedData(newArr);
-      }
-    };
-
   return (
     <StyledWrapper>
       <label className="email-label">{labelText}</label>
@@ -124,40 +61,8 @@ const MultiEmail = (props: Props) => {
           }
         }}
       >
-        {placeholder && emails.length === 0 && !isFocused ? (
-          <span data-placeholder>{placeholder}</span>
-        ) : null}
-        {emails.map((item, index) => (
-          <StyledEmailContainer className="tag-item" key={`${item.email}`}>
-            <StyledEmail
-              onClick={!isEdit ? changeEditStatus(index) : undefined}
-              isedit={item.edit ? 1 : 0}
-            >
-              {!item.edit && (
-                <>
-                  <span>{item.email}</span>
-                  <button
-                    type="button"
-                    className="button"
-                    onClick={handleDelete(item)}
-                  >
-                    &times;
-                  </button>
-                </>
-              )}
-              {item.edit && (
-                <input
-                  ref={emailInputRef!}
-                  className={`email-input ${error && "has-error"}`}
-                  value={value || item.email}
-                  name="email"
-                  onChange={handleChange}
-                  onKeyDown={(e) => onBlurEdit(index)}
-                />
-              )}
-            </StyledEmail>
-          </StyledEmailContainer>
-        ))}
+        {placeholder && emails.length === 0 && !isFocused ? <span data-placeholder>{placeholder}</span> : null}
+        <EmailsView emails={emails} emailInputRef={emailInputRef} getEmails={getEmails} />
         {!isEdit && (
           <input
             ref={emailInputRef!}

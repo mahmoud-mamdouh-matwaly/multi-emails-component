@@ -18,3 +18,9 @@ export interface ContainerTextAreaProps {
 export interface isEditProps {
   isedit: number;
 }
+
+export type EmailsViewProps = {
+  getEmails: (emails: Email[]) => void;
+  emails: Email[];
+  emailInputRef: React.RefObject<HTMLInputElement>;
+};
