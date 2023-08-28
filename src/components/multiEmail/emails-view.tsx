@@ -32,7 +32,8 @@ const EmailsView = (props: EmailsViewProps) => {
     handleValue("");
     handleError(null);
   };
-  const onBlurEdit = (index: number) => (evt: { target: { value: string }; key: string; preventDefault: () => void }) => {
+
+  const onBlurEdit = (index: number, evt: { target: { value: string }; key: string; preventDefault: () => void } | any) => {
     if (["Enter", "Tab", ","].includes(evt.key)) {
       const newValue = evt.target.value?.trim();
       const newArr = [...emails];
@@ -67,13 +68,12 @@ const EmailsView = (props: EmailsViewProps) => {
                 value={value || item.email}
                 name="email"
                 onChange={handleChange}
-                onKeyDown={(e) => onBlurEdit(index)}
+                onKeyDown={(e) => onBlurEdit(index, e) }
               />
             )}
           </StyledEmail>
         </StyledEmailContainer>
       ))}
-      ;
     </>
   );
 };

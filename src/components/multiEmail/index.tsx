@@ -10,7 +10,7 @@ const MultiEmail = (props: Props) => {
 
   const emailInputRef = useRef<HTMLInputElement>(null);
 
-  const { value, handleValue, error, handleError, isFocused, handleIsFocused, handleIsEdit, isEdit } = useEmailsBox();
+  const { value, handleValue, error, handleError, isFocused, handleIsFocused, isEdit } = useEmailsBox();
 
   const handleKeyDown = (evt: any) => {
     if (["Enter", "Tab", ","].includes(evt.key)) {
