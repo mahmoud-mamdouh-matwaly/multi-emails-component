@@ -1,5 +1,5 @@
 
-# Multi Email Component [![npm](https://img.shields.io/npm/v/https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fmulti-emails-component)](https://www.npmjs.com/package/multi-emails-component)
+# Multi Email Component [![npm](https://img.shields.io/npm/v/multi-emails-component)](https://www.npmjs.com/package/multi-emails-component)
 
 
 A react component to format multiple email easily.
